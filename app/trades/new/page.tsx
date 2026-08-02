@@ -1,0 +1,1 @@
+import TradeForm from '@/components/TradeForm'; export default function Page(){return <><h1 className="page-title">New Trade</h1><div className="muted">Log your complete setup, execution, psychology, and result.</div><TradeForm/></>}

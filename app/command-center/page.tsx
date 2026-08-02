@@ -1,0 +1,36 @@
+'use client'
+
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { Activity, BellRing, CalendarClock, Clock3, Plus, Radar, Search, ShieldCheck, Trash2 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import type { Trade } from '@/lib/types'
+import { money } from '@/lib/utils'
+
+type WatchItem={symbol:string; note:string}
+type EventItem={id:string; time:string; currency:string; title:string; impact:'High'|'Medium'|'Low'}
+const defaultWatch:WatchItem[]=[{symbol:'XAUUSD',note:'Best: 7:30 AM–10:00 AM MT'},{symbol:'EURUSD',note:'Best: 2:00 AM–5:00 AM MT'},{symbol:'GBPUSD',note:'Best: 2:00 AM–5:00 AM MT'}]
+const zones=[['Sydney','Australia/Sydney'],['Tokyo','Asia/Tokyo'],['London','Europe/London'],['New York','America/New_York']] as const
+
+export default function CommandCenterPage(){
+ const [trades,setTrades]=useState<Trade[]>([]),[watch,setWatch]=useState<WatchItem[]>(defaultWatch),[events,setEvents]=useState<EventItem[]>([])
+ const [symbol,setSymbol]=useState(''),[note,setNote]=useState(''),[now,setNow]=useState(new Date())
+ useEffect(()=>{try{const allowed=new Set(['XAUUSD','EURUSD','GBPUSD']);const stored=JSON.parse(localStorage.getItem('tjp-watchlist')||'null') as WatchItem[]|null;const focused=(stored||defaultWatch).filter(w=>allowed.has(w.symbol));setWatch(focused.length?focused:defaultWatch);setEvents(JSON.parse(localStorage.getItem('tjp-events')||'[]'))}catch{};supabase.from('trades').select('*').order('trade_date',{ascending:false}).limit(150).then(r=>setTrades((r.data||[]) as Trade[]));const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id)},[])
+ const today=new Date().toISOString().slice(0,10), todayTrades=trades.filter(t=>t.trade_date===today), open=trades.filter(t=>t.result==='Open')
+ const net=todayTrades.reduce((s,t)=>s+(Number(t.profit_loss)||0),0)
+ const saveWatch=(v:WatchItem[])=>{setWatch(v);localStorage.setItem('tjp-watchlist',JSON.stringify(v))}
+ const saveEvents=(v:EventItem[])=>{setEvents(v);localStorage.setItem('tjp-events',JSON.stringify(v))}
+ const alerts=useMemo(()=>{const a:string[]=[];const recent=trades.filter(t=>t.result==='Win'||t.result==='Loss').slice(0,5);if(recent.slice(0,3).every(t=>t.result==='Loss')&&recent.length>=3)a.push('Three consecutive losses detected. Consider pausing.');if(todayTrades.length>=3)a.push(`${todayTrades.length} trades logged today. Check your daily trade limit.`);if(open.length)a.push(`${open.length} open trade${open.length===1?'':'s'} need active risk monitoring.`);return a},[trades,todayTrades.length,open.length])
+ function addWatch(){const s=symbol.trim().toUpperCase();const allowed=new Set(['XAUUSD','EURUSD','GBPUSD']);if(!allowed.has(s)){alert('Only XAUUSD, EURUSD, and GBPUSD are enabled in this focused version.');return}if(!s||watch.some(w=>w.symbol===s))return;saveWatch([...watch,{symbol:s,note:note.trim()}]);setSymbol('');setNote('')}
+ function addEvent(){saveEvents([...events,{id:crypto.randomUUID(),time:'08:30',currency:'USD',title:'High-impact event',impact:'High'}])}
+ return <>
+  <div className="command-hero"><div><div className="eyebrow">Version 17 command center</div><h1 className="page-title">AI Trading Command Center</h1><p className="muted">Monitor your process, sessions, watchlist, risk and journal activity from one screen.</p></div><div className="command-actions"><Link href="/session-guide" className="button secondary link-button"><Clock3 size={16}/>Session guide</Link><Link href="/search" className="button secondary link-button"><Search size={16}/>Global search</Link><Link href="/live-assistant" className="button link-button"><Radar size={16}/>Plan setup</Link></div></div>
+  <div className="command-kpis"><div className="card"><span>Today P/L</span><strong>{money(net)}</strong><small>{todayTrades.length} trades</small></div><div className="card"><span>Open positions</span><strong>{open.length}</strong><small>Journal records</small></div><div className="card"><span>Process alerts</span><strong>{alerts.length}</strong><small>Based on your journal</small></div><div className="card"><span>Watchlist</span><strong>{watch.length}</strong><small>Saved on this device</small></div></div>
+  <section className="card session-card"><div className="section-heading"><div><h2>Global session clocks</h2><p>Use session context, not the clock alone, to make decisions.</p></div><Clock3/></div><div className="session-grid">{zones.map(([name,tz])=><div key={name}><span>{name}</span><strong>{now.toLocaleTimeString('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit'})}</strong><small>{now.toLocaleDateString('en-US',{timeZone:tz,weekday:'short',month:'short',day:'numeric'})}</small></div>)}</div></section>
+  <div className="command-grid">
+   <section className="card"><div className="section-heading"><div><h2>Watchlist</h2><p>Add symbols and a reason to watch them.</p></div><Activity/></div><div className="watch-add"><input value={symbol} onChange={e=>setSymbol(e.target.value)} placeholder="Symbol"/><input value={note} onChange={e=>setNote(e.target.value)} placeholder="Focus note"/><button className="button" onClick={addWatch}><Plus size={15}/></button></div><div className="watch-list">{watch.map(w=><div key={w.symbol}><span><strong>{w.symbol}</strong><small>{w.note||'No note'}</small></span><button onClick={()=>saveWatch(watch.filter(x=>x.symbol!==w.symbol))} aria-label={`Remove ${w.symbol}`}><Trash2 size={14}/></button></div>)}</div></section>
+   <section className="card"><div className="section-heading"><div><h2>Process alerts</h2><p>Journal-based reminders, not trade signals.</p></div><BellRing/></div>{alerts.length?<div className="alert-list">{alerts.map((a,i)=><div key={i}><ShieldCheck size={16}/><span>{a}</span></div>)}</div>:<div className="empty-inline">No urgent process alerts.</div>}<Link href="/smart-alerts" className="review-link">Open Smart Alerts →</Link></section>
+   <section className="card command-calendar"><div className="section-heading"><div><h2>Economic event board</h2><p>Manual event planner. Verify event times with your trusted calendar.</p></div><CalendarClock/></div><button className="button secondary" onClick={addEvent}><Plus size={15}/>Add event</button><div className="event-list">{events.length?events.map((e,i)=><div key={e.id}><input type="time" value={e.time} onChange={x=>saveEvents(events.map((v,n)=>n===i?{...v,time:x.target.value}:v))}/><input value={e.currency} onChange={x=>saveEvents(events.map((v,n)=>n===i?{...v,currency:x.target.value.toUpperCase()}:v))}/><input value={e.title} onChange={x=>saveEvents(events.map((v,n)=>n===i?{...v,title:x.target.value}:v))}/><select value={e.impact} onChange={x=>saveEvents(events.map((v,n)=>n===i?{...v,impact:x.target.value as EventItem['impact']}:v))}><option>High</option><option>Medium</option><option>Low</option></select><button onClick={()=>saveEvents(events.filter(x=>x.id!==e.id))}><Trash2 size={14}/></button></div>):<div className="empty-inline">No events added for today.</div>}</div></section>
+  </div>
+ </>
+}
