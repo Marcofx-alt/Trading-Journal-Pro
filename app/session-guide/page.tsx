@@ -21,8 +21,8 @@ const markets: Market[] = [
     bestSession: 'London + New York overlap',
     windows: [
       { label: 'London Open', start: 60, end: 300 },
-      { label: 'New York Open', start: 450, end: 660 },
-      { label: 'Best of all', start: 450, end: 600, best: true },
+      { label: 'New York forex window', start: 360, end: 600 },
+      { label: 'Best of all', start: 390, end: 600, best: true },
     ],
     reasons: ['Highest liquidity', 'Strong trends', 'Tighter spreads', 'Momentum around major economic news'],
     avoid: ['Late New York afternoon', 'Quiet Asian session unless major news is active'],
@@ -35,7 +35,7 @@ const markets: Market[] = [
     windows: [
       { label: 'London window', start: 60, end: 300 },
       { label: 'Best', start: 120, end: 300, best: true },
-      { label: 'Second best', start: 450, end: 600 },
+      { label: 'Second best', start: 360, end: 600 },
     ],
     reasons: ['Most volume arrives during London hours', 'Spreads are often lowest', 'Trends can be cleaner'],
     accent: 'euro',
@@ -47,23 +47,28 @@ const markets: Market[] = [
     windows: [
       { label: 'London window', start: 60, end: 300 },
       { label: 'Best', start: 120, end: 300, best: true },
-      { label: 'Second best', start: 450, end: 600 },
+      { label: 'Second best', start: 360, end: 600 },
     ],
     reasons: ['Strong London-session participation', 'Often moves more than EURUSD', 'Extra momentum around UK economic releases'],
     accent: 'pound',
   },
 ]
 
-function mtParts(date: Date) {
+function localParts(date: Date, timeZone?: string) {
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Edmonton',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+    ...(timeZone ? { timeZone } : {}),
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
     weekday: 'long', month: 'short', day: 'numeric', year: 'numeric',
   }).formatToParts(date)
   const get = (type: string) => parts.find(p => p.type === type)?.value || ''
   return {
-    minutes: Number(get('hour')) * 60 + Number(get('minute')),
-    time: `${get('hour')}:${get('minute')}:${get('second')}`,
+    minutes: (() => {
+      let hour = Number(get('hour')) % 12
+      if (get('dayPeriod') === 'PM') hour += 12
+      return hour * 60 + Number(get('minute'))
+    })(),
+    time: `${get('hour')}:${get('minute')}:${get('second')} ${get('dayPeriod')}`,
+    zone: timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local device time',
     date: `${get('weekday')}, ${get('month')} ${get('day')}, ${get('year')}`,
   }
 }
@@ -79,18 +84,18 @@ function formatMinutes(total: number) {
 export default function SessionGuidePage() {
   const [now, setNow] = useState(new Date())
   useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id) }, [])
-  const mt = useMemo(() => mtParts(now), [now])
+  const mt = useMemo(() => localParts(now), [now])
 
   return <>
     <div className="session-guide-hero">
       <div>
-        <div className="eyebrow">Focused market plan · Alberta time</div>
+        <div className="eyebrow">Focused market plan · your local time</div>
         <h1 className="page-title">Trading Session Guide</h1>
         <p className="muted">Your app is now focused on XAUUSD, EURUSD, and GBPUSD only. Use these windows as planning context, not as guaranteed signals.</p>
       </div>
       <div className="mt-clock card">
         <Clock3 size={22}/>
-        <div><span>Mountain Time — Alberta</span><strong>{mt.time}</strong><small>{mt.date}</small></div>
+        <div><span>Your local time</span><strong>{mt.time}</strong><small>{mt.date} · {mt.zone}</small></div>
       </div>
     </div>
 
@@ -129,7 +134,7 @@ export default function SessionGuidePage() {
 
     <section className="card session-reminder">
       <MoonStar size={24}/>
-      <div><h2>Work-schedule reminder</h2><p>Your 7:00 AM–3:00 PM shift overlaps the New York window. Use early mornings, days off, backtesting, and alerts rather than forcing a live trade while working.</p></div>
+      <div><h2>Work-schedule reminder</h2><p>Your 7:00 AM–3:00 PM shift overlaps much of the New York window. Use early mornings, days off, backtesting, and alerts rather than forcing a live trade while working.</p></div>
     </section>
   </>
 }

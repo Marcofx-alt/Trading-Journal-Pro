@@ -1,13 +1,16 @@
 {
   "name": "trading-journal-pro",
-  "version": "21.0.0",
+  "version": "22.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "mobile:check": "node -e \"console.log('Mobile foundation ready. Deploy the web app before adding Capacitor.')\""
+    "mobile:check": "node -e \"console.log('Mobile foundation ready. Deploy the web app before adding Capacitor.')\"",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "desktop:check": "node desktop/check-desktop.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
@@ -21,6 +24,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "@tauri-apps/cli": "^2.10.0"
   }
 }

@@ -78,3 +78,8 @@ No new Supabase migration is required. Planner, playbook, replay and workspace p
 
 ## v21 Mobile Foundation
 This release adds responsive mobile navigation, PWA installation assets, safe-area support and a mobile tools drawer. See `docs-mobile.md` for the Android/iOS packaging roadmap.
+
+## v22.1 time correction
+- Session Guide clock now follows the device/browser local timezone.
+- Displays the detected IANA timezone beside the date.
+- Corrected New York forex and overlap windows to begin earlier than the U.S. stock open.

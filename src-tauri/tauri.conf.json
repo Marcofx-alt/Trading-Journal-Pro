@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Trading Journal Pro",
+  "version": "22.0.0",
+  "identifier": "com.marcon.tradingjournalpro",
+  "build": {
+    "frontendDist": "../desktop-placeholder"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "category": "Finance",
+    "shortDescription": "Professional AI trading journal",
+    "longDescription": "Trading Journal Pro helps traders plan, record, review and improve their trading process.",
+    "copyright": "Copyright © 2026 Marco.N",
+    "publisher": "Marco.N",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "perMachine"
+      }
+    }
+  }
+}
