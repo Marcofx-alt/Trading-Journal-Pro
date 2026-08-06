@@ -1,4 +1,4 @@
-export const pairs=['XAUUSD','EURUSD','GBPUSD']
+export const pairs=['XAUUSD','EURUSD','GBPUSD','USDJPY','AUDJPY','AUDUSD']
 export const periods=['Before Work','After Work','Evening','Night','Day Off','Weekend']
 export const timeframes=['M1','M5','M15','M30','H1','H4','D1']
 export const weights={valid_zone:15,liquidity_marked:10,liquidity_swept:20,fvg_present:15,fvg_mitigated:10,candle_confirmation:20,followed_plan:10} as const

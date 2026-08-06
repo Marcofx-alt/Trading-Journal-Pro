@@ -1,6 +1,6 @@
 {
   "name": "trading-journal-pro",
-  "version": "22.0.0",
+  "version": "22.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

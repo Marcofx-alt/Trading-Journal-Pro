@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { Maximize2, PanelsTopLeft, Save } from 'lucide-react'
 type Slot={symbol:string;timeframe:string;notes:string}
-const defaults:Slot[]=[{symbol:'XAUUSD',timeframe:'15m',notes:'Gold — focus on London/New York overlap'},{symbol:'EURUSD',timeframe:'1h',notes:'London session focus'},{symbol:'GBPUSD',timeframe:'15m',notes:'London session focus'},{symbol:'XAUUSD',timeframe:'5m',notes:'Gold lower-timeframe confirmation'}]
+const defaults:Slot[]=[{symbol:'XAUUSD',timeframe:'15m',notes:'Gold — focus on London/New York overlap'},{symbol:'EURUSD',timeframe:'1h',notes:'London session focus'},{symbol:'GBPUSD',timeframe:'15m',notes:'London session focus'},{symbol:'USDJPY',timeframe:'15m',notes:'Tokyo session focus'}]
 export default function MultiChartPage(){const [slots,setSlots]=useState<Slot[]>(defaults),[layout,setLayout]=useState('2x2')
  useEffect(()=>{try{const x=JSON.parse(localStorage.getItem('tjp_chart_workspace')||'null');if(x){setSlots(x.slots||defaults);setLayout(x.layout||'2x2')}}catch{}},[])
  function update(i:number,k:keyof Slot,v:string){setSlots(s=>s.map((x,n)=>n===i?{...x,[k]:v}:x))}
