@@ -41,7 +41,7 @@ create table if not exists public.backtests (
   historical_trade_date date not null,
   pair text not null,
   direction text not null check (direction in ('Buy','Sell')),
-  result text not null check (result in ('Win','Loss','Breakeven')),
+  result text not null check (result in ('Win','Loss','Breakeven','Skipped')),
   r_multiple numeric,
   setup_score integer default 0,
   trade_grade text default 'Needs Review',

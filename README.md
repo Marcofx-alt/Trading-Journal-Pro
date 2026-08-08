@@ -83,3 +83,14 @@ This release adds responsive mobile navigation, PWA installation assets, safe-ar
 - Session Guide clock now follows the device/browser local timezone.
 - Displays the detected IANA timezone beside the date.
 - Corrected New York forex and overlap windows to begin earlier than the U.S. stock open.
+
+## v22.3 Backtesting Outcome Automation
+
+Backtesting now supports a fast outcome-first workflow. Instead of entering Entry, Stop Loss, Take Profit, Result, and R Multiple manually, choose one outcome:
+
+- Take Profit Hit -> Win; enter only the R achieved.
+- Stop Loss Hit -> Loss; R is automatically -1R.
+- Breakeven -> Breakeven; R is automatically 0R.
+- No Entry / Skipped -> Skipped; no R is recorded and the row is excluded from win-rate and average-R calculations.
+
+Existing backtest records remain compatible. Run `supabase/upgrade_v10_backtest_outcomes.sql` once before using the Skipped outcome.

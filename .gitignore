@@ -1,25 +1,5 @@
 
-node_modules/
-.next/
-out/
-dist/
-build/
-
-.env
-.env.local
-.env*.local
-.env.production
-
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-
-.DS_Store
-Thumbs.db
-.vscode/
-
+# Tauri build output
 src-tauri/target/
-android/.gradle/
-android/build/
-android/app/build/
-ios/App/build/
+node_modules/
+.env.local
