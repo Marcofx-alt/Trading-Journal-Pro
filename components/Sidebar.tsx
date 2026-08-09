@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { BarChart3, BookOpenCheck, Brain, CalendarDays, Images, LayoutDashboard, PlusCircle, TestTube2, Settings, Sparkles, LogOut, Bot, ListChecks, FileUp, Target, ChartNoAxesCombined, Radar, ScanSearch, BrainCircuit, ShieldCheck, FileText, PanelsTopLeft, FlaskConical, Gauge, BellRing, Search, Lightbulb, ArchiveRestore, BookMarked, CandlestickChart, ClipboardCheck, GalleryHorizontalEnd, Landmark, Home, Clock4 } from 'lucide-react'
+import { BarChart3, BookOpenCheck, Brain, CalendarDays, Images, LayoutDashboard, PlusCircle, TestTube2, Settings, Sparkles, LogOut, Bot, ListChecks, FileUp, Target, ChartNoAxesCombined, Radar, ScanSearch, BrainCircuit, ShieldCheck, FileText, PanelsTopLeft, FlaskConical, GitCompareArrows, Gauge, BellRing, Search, Lightbulb, ArchiveRestore, BookMarked, CandlestickChart, ClipboardCheck, GalleryHorizontalEnd, Landmark, Home, Clock4 } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 import { supabase } from '@/lib/supabase'
 
@@ -22,6 +22,7 @@ const items = [
   ['/trades/new', 'New Trade', PlusCircle],
   ['/chart-library', 'Chart Library', Images],
   ['/backtesting', 'Backtesting', TestTube2],
+  ['/strategy-comparison', 'Strategy Comparison', GitCompareArrows],
   ['/psychology', 'Psychology', Brain],
   ['/ai-coach', 'AI Coach', Bot],
   ['/strategies', 'Strategy Builder', ListChecks],
