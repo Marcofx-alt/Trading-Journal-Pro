@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
-  BarChart3, BellRing, BookOpenCheck, Bot, BrainCircuit, ChartNoAxesCombined,
-  ChevronDown, ClipboardCheck, Clock4, FileUp, Gauge, Home, Images, Landmark,
-  LayoutDashboard, ListChecks, LogOut, Menu, MoreHorizontal, PlusCircle,
-  Radar, ScanSearch, Search, Settings, ShieldCheck, Target, TestTube2, X
+  BellRing, BookOpenCheck, Bot, Brain, BrainCircuit, ChartNoAxesCombined,
+  ClipboardCheck, Clock4, FileText, FileUp, Gauge, GitCompareArrows, Home,
+  Images, Landmark, LayoutDashboard, Leaf, Lightbulb, LogOut, Menu,
+  MoreHorizontal, Newspaper, NotebookPen, PlusCircle, Radar, Search, Settings,
+  ShieldCheck, Target, TestTube2, X, CalendarDays, BookMarked, PanelsTopLeft,
+  FlaskConical
 } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 import { supabase } from '@/lib/supabase'
@@ -16,29 +18,52 @@ const primary = [
   ['/home', 'Home', Home],
   ['/trade-planner', 'Planner', ClipboardCheck],
   ['/trades/new', 'New', PlusCircle],
-  ['/trades', 'Trades', BookOpenCheck],
+  ['/pnl-calendar', 'P&L', CalendarDays],
 ] as const
 
-const moreItems = [
-  ['/institutional-dashboard', 'Institutional Dashboard', Landmark],
-  ['/command-center', 'Command Center', Gauge],
-  ['/session-guide', 'Session Guide', Clock4],
-  ['/dashboard', 'Dashboard', LayoutDashboard],
-  ['/chart-library', 'Chart Library', Images],
-  ['/backtesting', 'Backtesting', TestTube2],
-  ['/ai-coach', 'AI Coach', Bot],
-  ['/strategies', 'Strategy Builder', ListChecks],
-  ['/broker-sync', 'Broker Sync', FileUp],
-  ['/analytics', 'Analytics Center', ChartNoAxesCombined],
-  ['/live-assistant', 'Live Assistant', Radar],
-  ['/chart-vision', 'AI Chart Vision', ScanSearch],
-  ['/intelligence', 'Trade Intelligence', BrainCircuit],
-  ['/risk-center', 'Risk Center', ShieldCheck],
-  ['/smart-alerts', 'Smart Alerts', BellRing],
-  ['/search', 'Global Search', Search],
-  ['/goals', 'Goals', Target],
-  ['/reviews/weekly', 'Weekly Review', BarChart3],
-  ['/settings', 'Settings', Settings],
+const groups = [
+  {
+    label: 'Plan & trade',
+    items: [
+      ['/institutional-dashboard', 'Institutional Dashboard', Landmark],
+      ['/command-center', 'Command Center', Gauge],
+      ['/session-guide', 'Session Guide', Clock4],
+      ['/playbooks', 'Trading Plans', BookMarked],
+      ['/news', 'News', Newspaper],
+      ['/workspace', 'Trading Workspace', PanelsTopLeft],
+      ['/trades', 'Trades', BookOpenCheck],
+      ['/chart-library', 'Chart Library', Images],
+      ['/live-assistant', 'Live Assistant', Radar],
+      ['/risk-center', 'Risk Center', ShieldCheck],
+      ['/smart-alerts', 'Smart Alerts', BellRing],
+    ],
+  },
+  {
+    label: 'Review & improve',
+    items: [
+      ['/dashboard', 'Dashboard', LayoutDashboard],
+      ['/analytics', 'Analytics Center', ChartNoAxesCombined],
+      ['/intelligence', 'Trade Intelligence', BrainCircuit],
+      ['/performance-insights', 'Performance Insights', Lightbulb],
+      ['/reports', 'Reports Center', FileText],
+      ['/notebook', 'Notebook', NotebookPen],
+      ['/psychology', 'Psychology', Brain],
+      ['/sanctuary', 'Sanctuary', Leaf],
+      ['/ai-coach', 'Trading Journal AI', Bot],
+    ],
+  },
+  {
+    label: 'Research & system',
+    items: [
+      ['/backtesting', 'Backtesting', TestTube2],
+      ['/strategy-comparison', 'Strategy Comparison', GitCompareArrows],
+      ['/strategy-lab', 'Strategy Lab', FlaskConical],
+      ['/broker-sync', 'Broker Sync', FileUp],
+      ['/search', 'Global Search', Search],
+      ['/goals', 'Goals', Target],
+      ['/settings', 'Settings', Settings],
+    ],
+  },
 ] as const
 
 export default function MobileNavigation() {
@@ -88,18 +113,21 @@ export default function MobileNavigation() {
           <section className="mobile-sheet" role="dialog" aria-modal="true" aria-label="All app sections" onClick={(event) => event.stopPropagation()}>
             <div className="mobile-sheet-handle" />
             <div className="mobile-sheet-head">
-              <div>
-                <span>Trading Journal Pro</span>
-                <strong>All tools</strong>
-              </div>
+              <div><span>Trading Journal Pro</span><strong>All tools</strong></div>
               <button className="mobile-icon-button" onClick={() => setOpen(false)} aria-label="Close navigation"><X size={21} /></button>
             </div>
-            <div className="mobile-sheet-grid">
-              {moreItems.map(([href, label, Icon]) => (
-                <Link key={href} href={href} className={pathname === href ? 'mobile-tool active' : 'mobile-tool'}>
-                  <Icon size={20} />
-                  <span>{label}</span>
-                </Link>
+            <div className="mobile-sheet-groups">
+              {groups.map((group) => (
+                <section className="mobile-tool-group" key={group.label}>
+                  <div className="mobile-tool-group-label">{group.label}</div>
+                  <div className="mobile-sheet-grid">
+                    {group.items.map(([href, label, Icon]) => (
+                      <Link key={href} href={href} className={pathname === href ? 'mobile-tool active' : 'mobile-tool'}>
+                        <Icon size={20} /><span>{label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
             <button className="mobile-signout" onClick={signOut} disabled={signingOut}>

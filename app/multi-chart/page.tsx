@@ -1,10 +1,5 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { Maximize2, PanelsTopLeft, Save } from 'lucide-react'
-type Slot={symbol:string;timeframe:string;notes:string}
-const defaults:Slot[]=[{symbol:'XAUUSD',timeframe:'15m',notes:'Gold — focus on London/New York overlap'},{symbol:'EURUSD',timeframe:'1h',notes:'London session focus'},{symbol:'GBPUSD',timeframe:'15m',notes:'London session focus'},{symbol:'USDJPY',timeframe:'15m',notes:'Tokyo session focus'}]
-export default function MultiChartPage(){const [slots,setSlots]=useState<Slot[]>(defaults),[layout,setLayout]=useState('2x2')
- useEffect(()=>{try{const x=JSON.parse(localStorage.getItem('tjp_chart_workspace')||'null');if(x){setSlots(x.slots||defaults);setLayout(x.layout||'2x2')}}catch{}},[])
- function update(i:number,k:keyof Slot,v:string){setSlots(s=>s.map((x,n)=>n===i?{...x,[k]:v}:x))}
- function save(){localStorage.setItem('tjp_chart_workspace',JSON.stringify({slots,layout}));alert('Workspace saved on this device.')}
- return <><div className="v20-hero"><div><div className="eyebrow">Multi-market preparation</div><h1 className="page-title">Multi-Chart Workspace</h1><p className="muted">Organize symbols, timeframes, and notes in one synchronized planning board.</p></div><div className="button-row"><select value={layout} onChange={e=>setLayout(e.target.value)}><option value="2x2">2 × 2</option><option value="1x2">1 × 2</option></select><button className="button" onClick={save}><Save size={16}/> Save layout</button></div></div><div className={`chart-workspace ${layout}`}>{slots.slice(0,layout==='1x2'?2:4).map((s,i)=><section className="card chart-slot" key={i}><header><PanelsTopLeft/><input value={s.symbol} onChange={e=>update(i,'symbol',e.target.value.toUpperCase())}/><select value={s.timeframe} onChange={e=>update(i,'timeframe',e.target.value)}>{['1m','5m','15m','30m','1h','4h','1D'].map(x=><option key={x}>{x}</option>)}</select><Maximize2 size={16}/></header><div className="chart-placeholder"><strong>{s.symbol}</strong><span>{s.timeframe} chart connection area</span><small>Use your broker or charting platform beside this planning workspace.</small></div><textarea value={s.notes} onChange={e=>update(i,'notes',e.target.value)} placeholder="Structure, zones, liquidity, invalidation…"/></section>)}</div></>}
+import { redirect } from 'next/navigation'
+
+export default function RemovedFeatureRedirect() {
+  redirect('/workspace')
+}

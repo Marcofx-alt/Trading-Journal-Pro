@@ -80,7 +80,7 @@ export default function WorkspacePage() {
       <section className="card workspace-actions">
         <div className="section-heading"><div><h2>Pre-trade workflow</h2><p>Use the same process before every entry.</p></div><Radar/></div>
         <div className="workspace-action-grid">
-          <Link href="/chart-vision" className="workspace-action"><BrainCircuit/><span><strong>Analyze chart</strong><small>Review visible market structure</small></span><ArrowRight/></Link>
+          <Link href="/chart-library" className="workspace-action"><BrainCircuit/><span><strong>Review charts</strong><small>Open saved chart screenshots and trade evidence</small></span><ArrowRight/></Link>
           <Link href="/live-assistant" className="workspace-action"><Radar/><span><strong>Score setup</strong><small>Check strategy rules before entry</small></span><ArrowRight/></Link>
           <Link href="/risk-center" className="workspace-action"><ShieldCheck/><span><strong>Calculate risk</strong><small>Size the position and check limits</small></span><ArrowRight/></Link>
           <Link href="/trades/new" className="workspace-action"><ClipboardCheck/><span><strong>Journal trade</strong><small>Record the plan and execution</small></span><ArrowRight/></Link>

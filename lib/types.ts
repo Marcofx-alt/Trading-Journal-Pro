@@ -23,3 +23,6 @@ export interface TradeReview { id:string; user_id:string; trade_id:string; strat
 export interface Goal { id:string; user_id:string; name:string; metric:'monthly_profit'|'win_rate'|'average_r'|'max_trades_day'|'max_daily_loss'|'review_rate'|'strategy_compliance'|'psychology_score'; target_value:number; period:'monthly'|'all_time'; is_active:boolean; created_at:string; updated_at:string }
 
 export interface LiveTradeAnalysis { id:string; user_id:string; strategy_id:string|null; pair:string; direction:Direction; trading_period:string|null; entry_timeframe:string|null; higher_timeframe_trend:string|null; entry_price:number|null; stop_loss:number|null; take_profit:number|null; risk_percent:number|null; planned_rr:number|null; rule_answers:Record<string,boolean>; setup_score:number; setup_grade:string; recommendation:string; notes:string|null; status:'Planned'|'Taken'|'Skipped'; created_at:string; updated_at:string }
+
+export interface AIChatThread { id:string; user_id:string; title:string; created_at:string; updated_at:string }
+export interface AIChatMessage { id:string; thread_id:string; user_id:string; role:'user'|'assistant'; content:string; created_at:string }

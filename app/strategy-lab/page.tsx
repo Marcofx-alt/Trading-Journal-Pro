@@ -136,7 +136,7 @@ export default function StrategyLabPage(){
   </div>
 
   {message&&<div className="error">{message}</div>}
-  {!strategies.length?<section className="card empty-state"><FlaskConical size={30}/><h2>No strategies yet</h2><p>Create a strategy and assign it to trades before using the lab.</p><Link className="button" href="/strategies">Open Strategy Builder</Link></section>:<>
+  {!strategies.length?<section className="card empty-state"><FlaskConical size={30}/><h2>No strategies yet</h2><p>Create or select a playbook and assign it to trades before using the lab.</p><Link className="button" href="/playbooks">Open Playbook Library</Link></section>:<>
    <div className="lab-summary-grid">
     <div className="card lab-summary"><Crown/><span>Current leader</span><strong>{leader?`${leader.strategy.name} v${leader.strategy.version}`:'More data needed'}</strong><small>{leader?.closed||0} closed trades · Lab score {leader?.score||0}</small></div>
     <div className="card lab-summary"><Target/><span>Strategy coverage</span><strong>{coverage}%</strong><small>{linkedClosed} of {totalClosed} closed trades linked</small></div>

@@ -1,1 +1,5 @@
-import ReviewPage from '@/components/ReviewPage';export default function Page(){return <ReviewPage mode="monthly"/>}
+import { redirect } from 'next/navigation'
+
+export default function RemovedFeatureRedirect() {
+  redirect('/reports')
+}
