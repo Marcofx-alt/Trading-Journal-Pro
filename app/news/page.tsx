@@ -64,6 +64,8 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [source, setSource] = useState('')
+  const [feedNotice, setFeedNotice] = useState('')
+  const [scope, setScope] = useState<'today' | 'upcoming' | 'week'>('today')
   const [view, setView] = useState<'list' | 'calendar'>('list')
   const [showBlockSettings, setShowBlockSettings] = useState(false)
   const [blockSettings, setBlockSettings] = useState<BlockSettings>({ enabled: true, impact: 'High', beforeMinutes: 30, afterMinutes: 15 })
@@ -96,9 +98,11 @@ export default function NewsPage() {
       const data = await response.json()
       setEvents(Array.isArray(data.events) ? data.events : [])
       setSource(data.source || '')
+      setFeedNotice(data.notice || '')
       setError(data.error || '')
     } catch (err) {
       setEvents([])
+      setFeedNotice('')
       setError(err instanceof Error ? err.message : 'Could not load the economic calendar.')
     } finally {
       setLoading(false)
@@ -109,15 +113,24 @@ export default function NewsPage() {
 
   const filtered = useMemo(() => events.filter(event => {
     const currencyOk = !event.currency || selectedCurrencies.length === 0 || selectedCurrencies.includes(event.currency)
-    const impactOk = selectedImpacts.includes(event.impact)
+    const impactOk = selectedImpacts.length === 0 || selectedImpacts.includes(event.impact)
     const categoryText = `${event.category} ${event.event}`.toLowerCase()
     const categoryOk = selectedCategories.length === 0 || selectedCategories.some(category => categoryText.includes(category.toLowerCase()))
     return currencyOk && impactOk && categoryOk
   }).sort((a, b) => +new Date(a.date) - +new Date(b.date)), [events, selectedCurrencies, selectedImpacts, selectedCategories])
 
+  const scopedEvents = useMemo(() => {
+    if (scope !== 'upcoming') return filtered
+    const current = now.getTime()
+    return filtered.filter(event => {
+      const time = new Date(event.date).getTime()
+      return Number.isFinite(time) && time >= current
+    })
+  }, [filtered, scope, now])
+
   const grouped = useMemo(() => {
     const map = new Map<string, EconomicEvent[]>()
-    filtered.forEach(event => {
+    scopedEvents.forEach(event => {
       const date = localDateFromIso(event.date)
       const key = date ? date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : event.date
       const bucket = map.get(key) || []
@@ -125,7 +138,7 @@ export default function NewsPage() {
       map.set(key, bucket)
     })
     return Array.from(map.entries())
-  }, [filtered])
+  }, [scopedEvents])
 
   const nextBlocked = useMemo(() => {
     if (!blockSettings.enabled) return null
@@ -155,6 +168,24 @@ export default function NewsPage() {
     setFrom(isoDate(start)); setTo(isoDate(end))
   }
 
+  function changeScope(next: 'today' | 'upcoming' | 'week') {
+    setScope(next)
+    const start = new Date()
+    const end = new Date(start)
+    if (next === 'today') {
+      setFrom(isoDate(start)); setTo(isoDate(start)); return
+    }
+    if (next === 'upcoming') {
+      end.setDate(end.getDate() + 7)
+      setFrom(isoDate(start)); setTo(isoDate(end)); return
+    }
+    const day = start.getDay()
+    start.setDate(start.getDate() - day)
+    end.setTime(start.getTime())
+    end.setDate(end.getDate() + 13)
+    setFrom(isoDate(start)); setTo(isoDate(end))
+  }
+
   function shiftRange(days: number) {
     const start = new Date(`${from}T12:00:00`)
     const end = new Date(`${to}T12:00:00`)
@@ -179,6 +210,12 @@ export default function NewsPage() {
         <button className="icon-button" onClick={loadEvents} title="Refresh calendar"><RefreshCw size={17} className={loading ? 'spin' : ''}/></button>
       </div>
     </header>
+
+    <div className="news-scope-tabs" role="tablist" aria-label="Economic calendar range">
+      <button className={scope === 'today' ? 'active' : ''} onClick={() => changeScope('today')}>Today</button>
+      <button className={scope === 'upcoming' ? 'active' : ''} onClick={() => changeScope('upcoming')}><BellRing size={15}/> Upcoming</button>
+      <button className={scope === 'week' ? 'active' : ''} onClick={() => changeScope('week')}><CalendarDays size={15}/> This & next week</button>
+    </div>
 
     <div className={`news-risk-strip ${nextBlocked?.blockedNow ? 'blocked' : ''}`}>
       <ShieldAlert size={19}/>
@@ -206,7 +243,7 @@ export default function NewsPage() {
         </section>
 
         <section className="news-filter-section">
-          <div className="news-filter-section-head"><strong>Impact</strong></div>
+          <div className="news-filter-section-head"><strong>Impact</strong><button onClick={() => setSelectedImpacts(selectedImpacts.length === impacts.length ? [] : [...impacts])}>{selectedImpacts.length === impacts.length ? 'Clear' : 'Select all'}</button></div>
           <div className="news-impact-list">{impacts.map(impact => <label key={impact}><input type="checkbox" checked={selectedImpacts.includes(impact)} onChange={() => toggle(impact, selectedImpacts, setSelectedImpacts)}/><i className={`impact-dot ${impactClass(impact)}`}/><span>{impact}</span></label>)}</div>
         </section>
 
@@ -218,11 +255,12 @@ export default function NewsPage() {
 
       <main className="news-main card">
         <div className="news-main-toolbar">
-          <div className="news-day-nav"><button className="icon-button" onClick={() => shiftRange(-1)}><ChevronLeft size={17}/></button><button className="icon-button" onClick={() => shiftRange(1)}><ChevronRight size={17}/></button><div><strong>{from === to ? new Date(`${from}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : `${from} → ${to}`}</strong><span>{filtered.length} events</span></div></div>
+          <div className="news-day-nav"><button className="icon-button" onClick={() => shiftRange(-1)}><ChevronLeft size={17}/></button><button className="icon-button" onClick={() => shiftRange(1)}><ChevronRight size={17}/></button><div><strong>{from === to ? new Date(`${from}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : `${from} → ${to}`}</strong><span>{scopedEvents.length} events</span></div></div>
           <div className="news-local-clock"><Clock3 size={17}/><div><strong>{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong><span>{timezone}</span></div></div>
         </div>
 
-        {error && <div className="news-feed-warning"><BellRing size={17}/><div><strong>Live calendar feed unavailable</strong><span>{error} Add TRADING_ECONOMICS_KEY in Vercel for a full production feed.</span></div></div>}
+        {error && <div className="news-feed-warning"><BellRing size={17}/><div><strong>Live calendar feed unavailable</strong><span>{error}</span></div></div>}
+        {!error && feedNotice && <div className="news-feed-notice"><BellRing size={17}/><div><strong>Live calendar connected</strong><span>{feedNotice}</span></div></div>}
 
         {view === 'list' ? <div className="news-list">
           <div className="news-list-head"><span>Time</span><span>Currency</span><span>Impact</span><span>Event</span><span>Actual</span><span>Forecast</span><span>Previous</span></div>
@@ -238,7 +276,7 @@ export default function NewsPage() {
                 <span>{formatValue(event.actual)}</span><span>{formatValue(event.forecast)}</span><span>{formatValue(event.previous)}</span>
               </div>
             })}
-          </section>) : <div className="news-empty"><CalendarDays size={32}/><strong>No matching events</strong><span>Try widening the date range or changing your filters.</span></div>}
+          </section>) : <div className="news-empty"><CalendarDays size={32}/><strong>No matching events</strong><span>{scope === 'upcoming' ? 'No upcoming releases match your filters. If all impact boxes are clear, all impact levels are shown. Try This & next week or refresh the feed.' : 'Try widening the date range or changing your filters.'}</span></div>}
         </div> : <div className="news-calendar-view">
           {grouped.length ? grouped.map(([day, dayEvents]) => <section key={day} className="news-calendar-day"><h3>{day}</h3><div>{dayEvents.map(event => <article key={event.id}><span><i className={`impact-dot ${impactClass(event.impact)}`}/>{event.currency || event.country}</span><strong>{event.event}</strong><small>{new Date(event.date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} · {event.impact}</small></article>)}</div></section>) : <div className="news-empty">No matching events.</div>}
         </div>}

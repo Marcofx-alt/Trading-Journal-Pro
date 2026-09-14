@@ -1,7 +1,8 @@
 
 # Tauri build output
 src-tauri/target/
-node_modules/
 .env.local
 .next/
+node_modules/
 *.tsbuildinfo
+src-tauri/target/

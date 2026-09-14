@@ -32,7 +32,7 @@ const presets: Preset[] = [
     summary: 'Your main supply & demand / liquidity model with confirmation and disciplined risk.',
     bias: 'Trade with the higher-timeframe structure unless a clear reversal model is present.',
     session: 'London / New York',
-    markets: 'XAUUSD, EURUSD, GBPUSD',
+    markets: 'XAUUSD, US100, EURUSD, GBPUSD',
     rules: [
       'Mark the higher-timeframe structure and directional bias.',
       'Wait for a valid supply or demand zone.',
@@ -52,7 +52,7 @@ const presets: Preset[] = [
     summary: 'A focused FVG setup that only triggers after the imbalance is respected and confirmation appears.',
     bias: 'Prefer FVGs aligned with higher-timeframe direction and displacement.',
     session: 'London / New York / Asia when tested',
-    markets: 'XAUUSD, EURUSD, GBPUSD, USDJPY, AUDJPY, AUDUSD',
+    markets: 'XAUUSD, US100, EURUSD, GBPUSD, USDJPY, AUDJPY, AUDUSD',
     rules: [
       'Identify a clean bullish or bearish FVG.',
       'Record the FVG timeframe.',
@@ -251,7 +251,7 @@ export default function PlaybooksPage() {
 
               <div className="plan-meta-grid">
                 <label><span>Session</span><input value={draft.session} onChange={(e) => setDraft({ ...draft, session: e.target.value })} placeholder="London / New York"/></label>
-                <label><span>Markets / Pairs</span><input value={draft.markets} onChange={(e) => setDraft({ ...draft, markets: e.target.value })} placeholder="XAUUSD, EURUSD"/></label>
+                <label><span>Markets / Pairs</span><input value={draft.markets} onChange={(e) => setDraft({ ...draft, markets: e.target.value })} placeholder="XAUUSD, US100, EURUSD"/></label>
                 <label><span>Accent</span><input type="color" value={draft.color} onChange={(e) => setDraft({ ...draft, color: e.target.value })}/></label>
               </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Clock3, Flame, Gem, Globe2, MoonStar, ShieldAlert, Sparkles, SunMedium } from 'lucide-react'
+import { BarChart3, Clock3, Flame, Gem, Globe2, MoonStar, ShieldAlert, Sparkles, SunMedium } from 'lucide-react'
 
 type Window = { label: string; start: number; end: number; best?: boolean }
 type Market = {
@@ -12,7 +12,7 @@ type Market = {
   reasons: string[]
   avoid?: string[]
   accent: string
-  icon: 'gold' | 'euro' | 'pound' | 'yen' | 'aussie'
+  icon: 'gold' | 'index' | 'euro' | 'pound' | 'yen' | 'aussie'
 }
 
 const morningMarkets: Market[] = [
@@ -26,6 +26,17 @@ const morningMarkets: Market[] = [
     reasons: ['Highest liquidity', 'Strong trends', 'Tighter spreads', 'Momentum around major economic news'],
     avoid: ['Late New York afternoon', 'Quiet Asian session unless major news is active'],
     accent: 'gold',
+  },
+  {
+    symbol: 'US100', name: 'Nasdaq 100', bestSession: 'New York Open', icon: 'index',
+    windows: [
+      { label: 'New York pre-market', start: 360, end: 450 },
+      { label: 'New York cash session', start: 450, end: 840 },
+      { label: 'Best open window', start: 450, end: 600, best: true },
+    ],
+    reasons: ['Strongest liquidity around the U.S. cash open', 'Good momentum and displacement for intraday setups', 'Highly responsive to major U.S. economic and tech-sector news'],
+    avoid: ['Be careful around major U.S. news releases', 'Late-session conditions can become slower or choppier'],
+    accent: 'index',
   },
   {
     symbol: 'EURUSD', name: 'Euro / U.S. Dollar', bestSession: 'London', icon: 'euro',
@@ -133,6 +144,7 @@ function formatMinutes(total: number) {
 
 function MarketIcon({ type }: { type: Market['icon'] }) {
   if (type === 'gold') return <Gem />
+  if (type === 'index') return <BarChart3 />
   if (type === 'euro') return <Sparkles />
   if (type === 'pound') return <Flame />
   if (type === 'yen') return <MoonStar />
@@ -183,7 +195,7 @@ export default function SessionGuidePage() {
       <div>
         <div className="eyebrow">24-hour market plan · your local time</div>
         <h1 className="page-title">Trading Session Guide</h1>
-        <p className="muted">Morning focus: XAUUSD, EURUSD and GBPUSD. After-work Asia focus: USDJPY, AUDJPY and AUDUSD. Session windows are planning context, not guaranteed signals.</p>
+        <p className="muted">Morning focus: XAUUSD, US100, EURUSD and GBPUSD. After-work Asia focus: USDJPY, AUDJPY and AUDUSD. Session windows are planning context, not guaranteed signals.</p>
       </div>
       <div className="mt-clock card">
         <Clock3 size={22}/>
@@ -193,7 +205,7 @@ export default function SessionGuidePage() {
 
     <section className="session-section-head">
       <div><SunMedium/><span><small>Morning plan</small><strong>London & New York</strong></span></div>
-      <p>Higher-liquidity windows for gold, EURUSD and GBPUSD.</p>
+      <p>Higher-liquidity windows for gold, US100, EURUSD and GBPUSD.</p>
     </section>
     <div className="session-market-grid">
       {morningMarkets.map(m => <MarketCard market={m} minutes={local.minutes} key={m.symbol}/>) }
